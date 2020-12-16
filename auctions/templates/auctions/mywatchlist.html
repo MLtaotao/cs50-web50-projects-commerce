@@ -1,0 +1,24 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <div>
+        <h2 style="width: 80%; display: inline;" >Active Listings</h2>
+        <h2 style="width: 20%; display: inline-block;"><a href="{% url 'creat' %}"><button type="button" class="btn btn-primary">Creat a Listing</button></a></h2>    
+    </div>
+    
+    <hr>
+    {% for auction in auctions.all %}
+        <div class="media">
+            <img src="{{ auction.img_url }}" class="align-self-center mr-3" alt="..." height="100" width="100vmax" style="object-fit: contain;">
+            <div class="media-body">
+            <h5 class="mt-0">{{ auction.title }}</h5>
+            {{ auction.description }}
+                <div style="color: red; bottom: 0px;">
+                    <h5 >$ {{ auction.price }}</h5>
+                </div>
+            </div>
+            <a href="{% url 'listing' auction.pk %}" class="btn btn-primary">See more details</a>
+        </div>
+        <hr>
+    {% endfor %}
+{% endblock %}

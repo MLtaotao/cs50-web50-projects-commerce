@@ -1,0 +1,66 @@
+{% extends "auctions/layout.html" %}
+
+{% load humanize %}
+
+{% block body %}
+    <div class="jumbotron">
+        <h1 class="display-4">{{ auction.title }}</h1>
+        <img src="{{ auction.img_url }}" alt="" style="height: 20vh;">
+        <p class="lead">Creat by {{ auction.user }}</p>
+        <p class="lead">{{ auction.description }}</p>
+        <hr class="my-4">
+        <p style="font-weight: bolder;">Current price: $ {{ auction.price }}</p>
+        {% if auction.sell_button == True %}
+            <h1 class="display-4" style="color: red;">Sold! the buyer is {{ auction.winner }}</h1>
+        {% endif %}
+    </div>
+    {% if user.is_authenticated  and auction.sell_button == False %}
+        {% if watchlist_button %}
+            <a class="btn btn-warning" href="{% url 'delwatchlist' user.id auction.id %}" role="button" >Remove from watchlist </a>
+        {% else %}
+            <a class="btn btn-secondary" href="{% url 'addwatchlist' user.id auction.id %}" role="button" >Add to watchlist </a>
+        {% endif %}
+        {% if user == auction.user %}
+            <a class="btn btn-danger" href="{% url 'closebid' auction.id %}" role="button">Close bid</a>
+        {% endif %}
+        <hr>
+        {% if bid_message %}
+            <div class="alert alert-danger" role="alert">
+                {{ bid_message }}
+            </div>
+        {% endif %}
+        <form action="{% url 'addbid' user.id auction.id %}" method="POST">
+            {% csrf_token %}
+            <div class="input-group mb-3" style="width: 20vw; min-width: 300px;">
+                <input type="number" class="form-control" placeholder="Bid price" aria-describedby="button-addon2" name="bidprice">
+                <div class="input-group-append">
+                  <button class="btn btn-primary" type="submit" id="button-addon2">Go for bid</button>
+                </div>
+            </div>
+        </form>
+    {% endif %}
+    <hr>
+    <ul class="list-group">
+        {% for comment in comments %}
+        <li class="list-group-item">
+            <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">{{ comment.user }}</h5>
+                  <p class="card-text">{{ comment.comment }}</p>
+                  <p class="card-text"><small class="text-muted">Last updated {{ comment.postdate|naturaltime }}</small></p>
+                </div>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+
+    {% if user.is_authenticated and auction.sell_button == False %}
+        <form action="{% url 'addcomment' user.id auction.id %}" method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" name="comment"></textarea>
+            </div>
+            <button class="btn btn-primary" type="submit" id="button-addon2">Comment</button>
+        </form>
+    {% endif %}
+{% endblock %}
